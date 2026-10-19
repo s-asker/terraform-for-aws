@@ -1,0 +1,7 @@
+FROM python:3.13-slim
+WORKDIR /app
+COPY app.py .
+ENV PYTHONUNBUFFERED=1 PORT=80
+USER 10001:10001
+EXPOSE 80
+CMD ["python", "app.py"]

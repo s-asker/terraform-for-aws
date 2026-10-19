@@ -2,6 +2,8 @@ resource "aws_vpc" "vpc_main" {
 
   cidr_block       = var.cidr_block
   instance_tenancy = "default"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = {
     Name = "main-vpc"
@@ -67,4 +69,64 @@ resource "aws_route_table_association" "private_subnet_route_table_association" 
   for_each = aws_subnet.private_subnet
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private_route_table.id
+}
+
+
+resource "aws_vpc_endpoint" "interface_endpoint_ecr_api" {
+  vpc_id            = aws_vpc.vpc_main.id
+  service_name      = "com.amazonaws.eu-north-1.ecr.api"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [for subnet in aws_subnet.public_subnet : subnet.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_sg.id
+  ]
+
+  private_dns_enabled = true
+}
+
+
+resource "aws_vpc_endpoint" "interface_endpoint_ecr_dkr" {
+  vpc_id            = aws_vpc.vpc_main.id
+  service_name      = "com.amazonaws.eu-north-1.ecr.dkr"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [for subnet in aws_subnet.public_subnet : subnet.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_sg.id
+  ]
+
+  private_dns_enabled = true
+}
+
+resource "aws_vpc_endpoint" "gateway_endpoint_ecr_s3" {
+  vpc_id            = aws_vpc.vpc_main.id
+  service_name      = "com.amazonaws.eu-north-1.s3"
+  vpc_endpoint_type = "Gateway"
+
+}
+
+
+resource "aws_security_group" "endpoint_sg" {
+  name        = "endpoint_sg"
+  description = "Allow HTTPS inbound traffic and all outbound traffic"
+  vpc_id      = aws_vpc.vpc_main.id
+
+  tags = {
+    Name = "endpoint_sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_https_endpoint" {
+  security_group_id = aws_security_group.endpoint_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_outbound_endpoint" {
+  security_group_id = aws_security_group.endpoint_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
 }

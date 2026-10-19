@@ -52,7 +52,13 @@ data "aws_iam_policy_document" "ecs_task_execution_policy" {
                   "logs:CreateLogGroup"]
     resources = ["*"]
   }
+  statement { 
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.app_secret.arn]
+  }
 }
+
 
 resource "aws_iam_policy" "ecs_task_execution_policy" {
   name        = "ecs_task_execution_policy"
