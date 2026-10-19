@@ -57,8 +57,15 @@ data "aws_iam_policy_document" "ecs_task_execution_policy" {
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [aws_secretsmanager_secret.app_secret.arn]
   }
+  statement { 
+    effect    = "Allow"
+    actions   = ["ecr:DescribeImages",
+                "ecr:DescribeRegistry",
+                "ecr:BatchGetImage",
+                "ecr:DescribeRepositories"]
+    resources = [aws_ecr_repository.ecr.arn]
+  }
 }
-
 
 resource "aws_iam_policy" "ecs_task_execution_policy" {
   name        = "ecs_task_execution_policy"
