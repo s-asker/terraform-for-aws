@@ -53,6 +53,10 @@ resource "aws_route_table" "public_route_table" {
 
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc_main.id
+  # route {
+  #   cidr_block = "0.0.0.0/0"
+  #   gateway_id = aws_internet_gateway.igw.id
+  # }
 
   tags = {
     Name = "main-private-rt"
@@ -103,6 +107,7 @@ resource "aws_vpc_endpoint" "gateway_endpoint_ecr_s3" {
   vpc_id            = aws_vpc.vpc_main.id
   service_name      = "com.amazonaws.eu-north-1.s3"
   vpc_endpoint_type = "Gateway"
+  route_table_ids = [aws_route_table.private_route_table.id]
 
 }
 
