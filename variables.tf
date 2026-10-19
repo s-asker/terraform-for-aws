@@ -19,12 +19,12 @@ variable "private_subnets" {
 }
 
 variable "cidr_block" {
-  type = string
+  type        = string
   description = "VPC CIDR Range"
 
 }
 
 variable "hosting_domain" {
-  type = string
+  type        = string
   description = "Domain used for the load balancer"
 }

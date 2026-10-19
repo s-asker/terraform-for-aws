@@ -2,7 +2,7 @@
  [
     {
       "name": "web-container",
-      "image": "nginx:latest",
+      "image": "${containerImage}:latest",
       "cpu": 512,
       "memory": 1024,
       "essential": true,
@@ -21,6 +21,12 @@
           "awslogs-stream-prefix": "ecs",
           "awslogs-create-group": "true"
         }
-      }
+      },
+      "secrets": [
+        {
+          "name": "APP_MESSAGE",
+          "valueFrom": "${secretARN}:APP_MESSAGE::"
+        }
+      ]
     }
   ]

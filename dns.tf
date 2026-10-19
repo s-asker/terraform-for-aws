@@ -28,10 +28,10 @@ resource "aws_route53_record" "dns_record" {
 }
 
 resource "aws_route53_record" "cert_dns_record" {
-  for_each = { for cert_data in aws_acm_certificate.cert.domain_validation_options : cert_data.domain_name => 
+  for_each = { for cert_data in aws_acm_certificate.cert.domain_validation_options : cert_data.domain_name =>
     {
-      name = cert_data.resource_record_name
-      type = cert_data.resource_record_type
+      name   = cert_data.resource_record_name
+      type   = cert_data.resource_record_type
       record = cert_data.resource_record_value
     }
   }
@@ -40,7 +40,7 @@ resource "aws_route53_record" "cert_dns_record" {
   name    = each.value.name
   type    = each.value.type
   records = [each.value.record]
-  ttl             = 300
+  ttl     = 300
 }
 
 # resource "aws_acm_certificate_validation" "cert_validation" {

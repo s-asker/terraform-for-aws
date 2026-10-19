@@ -12,8 +12,8 @@ data "aws_iam_policy_document" "ecs_assume_role_policy" {
 ######################## IAM TASK ROLE ####################
 
 resource "aws_iam_role" "ecs_task_role" {
-  name                = "ecs_task_role"
-  assume_role_policy  = data.aws_iam_policy_document.ecs_assume_role_policy.json # (not shown)
+  name               = "ecs_task_role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json # (not shown)
 }
 
 data "aws_iam_policy_document" "ecs_task_policy" {
@@ -40,30 +40,39 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attach" {
 
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name                = "ecs_task_execution_role"
-  assume_role_policy  = data.aws_iam_policy_document.ecs_assume_role_policy.json # (not shown)
+  name               = "ecs_task_execution_role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json # (not shown)
 }
 
 data "aws_iam_policy_document" "ecs_task_execution_policy" {
   statement {
-    effect    = "Allow"
-    actions   = ["logs:CreateLogStream", 
-                  "logs:PutLogEvents",
-                  "logs:CreateLogGroup"]
+    effect = "Allow"
+    actions = ["logs:CreateLogStream",
+      "logs:PutLogEvents",
+    "logs:CreateLogGroup"]
     resources = ["*"]
   }
-  statement { 
+  statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [aws_secretsmanager_secret.app_secret.arn]
   }
-  statement { 
-    effect    = "Allow"
-    actions   = ["ecr:DescribeImages",
-                "ecr:DescribeRegistry",
-                "ecr:BatchGetImage",
-                "ecr:DescribeRepositories"]
+  statement {
+    effect = "Allow"
+    actions = ["ecr:DescribeImages",
+      "ecr:DescribeRegistry",
+      "ecr:BatchGetImage",
+      "ecr:DescribeRepositories",
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+    "ecr:GetDownloadUrlForLayer"]
     resources = [aws_ecr_repository.ecr.arn]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
   }
 }
 
