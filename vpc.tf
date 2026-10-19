@@ -124,7 +124,7 @@ resource "aws_security_group" "endpoint_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "allow_https_endpoint" {
   security_group_id = aws_security_group.endpoint_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  referenced_security_group_id   = aws_security_group.ecs_allow_http.id
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
