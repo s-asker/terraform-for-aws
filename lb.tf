@@ -1,13 +1,17 @@
 resource "aws_lb_target_group" "ip_target_group" {
-  name        = "tg-ecs"
-  port        = 80
+  name_prefix = "tg-ecs"
+  port        = 8080
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.vpc_main.id
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/health"
     port                = "traffic-port"
     protocol            = "HTTP"
     interval            = 30

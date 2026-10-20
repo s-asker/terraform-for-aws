@@ -123,6 +123,18 @@ resource "aws_vpc_endpoint" "gateway_endpoint_ecr_secrets" {
   private_dns_enabled = true
 }
 
+resource "aws_vpc_endpoint" "gateway_endpoint_ecr_logs" {
+  vpc_id            = aws_vpc.vpc_main.id
+  service_name      = "com.amazonaws.eu-north-1.logs"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = [for subnet in aws_subnet.public_subnet : subnet.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_sg.id
+  ]
+  private_dns_enabled = true
+}
+
 
 resource "aws_security_group" "endpoint_sg" {
   name        = "endpoint_sg"

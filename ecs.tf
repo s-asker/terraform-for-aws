@@ -37,13 +37,13 @@ resource "aws_ecs_service" "ecs_service" {
   name            = "nginx-svc"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
-  desired_count   = 1
+  desired_count   = 2
 
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ip_target_group.arn
     container_name   = "web-container"
-    container_port   = 80
+    container_port   = 8080
   }
 
   force_new_deployment = true
@@ -57,7 +57,7 @@ resource "aws_ecs_service" "ecs_service" {
 
 
   network_configuration {
-    assign_public_ip = true
+    assign_public_ip = false
     security_groups  = [aws_security_group.ecs_allow_http.id]
     subnets          = [for subnet in aws_subnet.private_subnet : subnet.id]
 
@@ -77,9 +77,9 @@ resource "aws_security_group" "ecs_allow_http" {
 resource "aws_vpc_security_group_ingress_rule" "ecs_allow_http" {
   security_group_id            = aws_security_group.ecs_allow_http.id
   referenced_security_group_id = aws_security_group.lb_allow_http.id
-  from_port                    = 80
+  from_port                    = 8080
   ip_protocol                  = "tcp"
-  to_port                      = 80
+  to_port                      = 8080
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_allow_all_traffic" {
